@@ -1,4 +1,4 @@
 PyChat
 ======
 
-PyChat
+Python + Redis
