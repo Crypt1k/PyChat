@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="http://pronskiy.github.io/php-digest/assets/images/php-digest.png" type="image/png">
+    <title>PyRedisChat</title>
+    <style>
+        div#container {width: 70%; height: 100%; margin: 0 auto;}
+        h3 {text-align: center;}
+        div#chat {height: 500px; overflow-y: scroll; margin: 0 0 5px;}
+        form input#message {width: 85%;}
+        form input#submit {width: 10%;}
+        table#messages tr :first-child {width: 17%; color: dodgerblue;}
+        table#messages tr :last-child {width: 83%;}
+        tr.history {color: #777777;}
+        tr.new {}
+        strong#users {color:darkgreen; word-wrap:break-word;}
+    </style>
+</head>
+<body>
+<div id="container">
+    <h3>PyRedis Chat!</h3>
+
+    <div id="chat">
+        <table id="messages">{{comments}}</table>
+    </div>
+
+    <form id="publish" >
+        <input id="message" type="text" name="message" />
+        <input id="submit" type="submit" value="Send" />
+    </form>
+
+    <p>Users Online: <strong id="users"></strong></p>
+</div>
+<script>
+
+(function(){
+if ('WebSocket' in window) {
+    var ws = new WebSocket('ws://192.168.5.22:8888/realtime/');
+    ws.onopen = function(evt) {};
+    ws.onmessage = function (evt) {
+        var msg = JSON.parse(evt.data);
+
+        if (msg.listteners !== undefined) {
+            users.textContent = msg.listteners;
+        } else if (msg.user !== undefined) {
+            addComment(msg);
+            scrollDown();
+        } else {
+            console.log('wrong information');
+        }
+    };
+    ws.onclose = function() {};
+} else {
+    alert('WebSocket not supported');
+}
+
+})();
+
+    publish.onsubmit = function() {
+        if (this.elements.message.value != '') {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('data=' + encodeURIComponent(this.elements.message.value));
+            this.elements.message.value = '';
+        }
+        return false;
+    }
+
+    function addComment(data, history) {
+        var tr = document.createElement('tr');
+        if (typeof history === 'undefined') {
+            tr.className = 'news';
+        } else {
+            tr.className = 'history';
+        }
+        var firstTd = document.createElement('td');
+        var lastTd = document.createElement('td');
+        firstTd.textContent = data.user+' ('+getDate(data.date)+')';
+        lastTd.textContent = data.message;
+        tr.appendChild(firstTd);
+        tr.appendChild(lastTd);
+        messages.appendChild(tr);
+    }
+
+    function scrollDown() {
+        var div = document.getElementById('chat');
+        div.scrollTop = div.scrollHeight;
+    }
+
+    function getDate(date) {
+        var now = new Date();
+        var currDate = now.getFullYear()
+           +'-'+('0'  + (now.getMonth()+1)).slice(-2)
+           +'-'+('0'  + now.getDate()).slice(-2);
+        if (date.indexOf(currDate)+1) {
+            return date.slice(11);
+        } else {
+            return date.slice(0, 10);
+        }
+    }
+</script>
+</body>
+</html>
+
