@@ -1,4 +1,1 @@
-PyChat
-======
-
-Python + Redis
+# Simple PyChat using Tornado & Redis
