@@ -16,20 +16,10 @@ import datetime
 
 LISTENERS = []
 USERS = {
-    '127.0.0.1' : 'Admin'
-    ,'192.168.5.22' : 'Vitaliy'
-    , '192.168.5.49' : 'Alex E.'
-    , '192.168.5.69' : 'Pasha'
-    , '192.168.5.40' : 'Serg P'
-    , '192.168.5.105' : 'Serg D'
-    , '192.168.5.19' : 'Serg D2'
-    , '192.168.5.101' : 'Sasha A'
-    , '192.168.5.27' : 'Yura'
 }
 
 def redis_listener():
     r = redis.Redis()
-    #r = redis.StrictRedis(host='localhost', port=6379, db=0)
     ps = r.pubsub()
     ps.subscribe('test_realtime')
     io_loop = tornado.ioloop.IOLoop.instance()
